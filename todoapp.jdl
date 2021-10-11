@@ -1,0 +1,15 @@
+entity Card {
+  content String required minlength(1)
+  completed Boolean
+}
+entity Task {
+  name String required minlength(1)
+  cardOrder String required
+}
+relationship ManyToOne {
+  Card{task required} to Task
+}
+
+dto Card, Task with mapstruct
+service Card, Task with serviceImpl
+paginate Task with pagination

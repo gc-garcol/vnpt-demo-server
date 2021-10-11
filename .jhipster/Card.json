@@ -1,0 +1,34 @@
+{
+  "name": "Card",
+  "fields": [
+    {
+      "fieldName": "content",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "minlength"],
+      "fieldValidateRulesMinlength": "1"
+    },
+    {
+      "fieldName": "completed",
+      "fieldType": "Boolean"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "task",
+      "otherEntityRelationshipName": "card",
+      "relationshipValidateRules": "required",
+      "relationshipName": "task"
+    }
+  ],
+  "entityTableName": "card",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211011233042"
+}

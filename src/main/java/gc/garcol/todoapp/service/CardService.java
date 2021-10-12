@@ -16,6 +16,8 @@ public interface CardService {
      */
     CardDTO save(CardDTO cardDTO);
 
+    CardDTO create(CardDTO cardDTO);
+
     /**
      * Partially updates a card.
      *

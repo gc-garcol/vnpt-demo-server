@@ -8,6 +8,7 @@ import gc.garcol.todoapp.service.dto.CardDTO;
 import gc.garcol.todoapp.service.mapper.CardMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,20 +24,27 @@ import java.util.stream.Collectors;
 @Transactional
 public class CardServiceImpl implements CardService {
 
-    private final Logger log = LoggerFactory.getLogger(CardServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(CardServiceImpl.class);
 
-    private final CardRepository cardRepository;
+    @Autowired
+    private CardRepository cardRepository;
 
-    private final CardMapper cardMapper;
-
-    public CardServiceImpl(CardRepository cardRepository, CardMapper cardMapper) {
-        this.cardRepository = cardRepository;
-        this.cardMapper = cardMapper;
-    }
+    @Autowired
+    private CardMapper cardMapper;
 
     @Override
     public CardDTO save(CardDTO cardDTO) {
         log.debug("Request to save Card : {}", cardDTO);
+        Card card = cardMapper.toEntity(cardDTO);
+        Card storedCard = cardRepository.getById(cardDTO.getId());
+        card.setTask(storedCard.getTask());
+        card = cardRepository.save(card);
+        return cardMapper.toDto(card);
+    }
+
+    @Override
+    public CardDTO create(CardDTO cardDTO) {
+        log.debug("Request to create Card : {}", cardDTO);
         Card card = cardMapper.toEntity(cardDTO);
         Task task = new Task();
         task.setId(cardDTO.getTaskId());

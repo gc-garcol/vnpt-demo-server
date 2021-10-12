@@ -59,7 +59,7 @@ public class CardResource {
         if (cardDTO.getId() != null) {
             throw new BadRequestAlertException("A new card cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        CardDTO result = cardService.save(cardDTO);
+        CardDTO result = cardService.create(cardDTO);
         return ResponseEntity
             .created(new URI("/api/cards/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))

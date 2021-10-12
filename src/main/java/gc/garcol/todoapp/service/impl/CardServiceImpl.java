@@ -1,11 +1,15 @@
 package gc.garcol.todoapp.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gc.garcol.todoapp.domain.Card;
 import gc.garcol.todoapp.domain.Task;
 import gc.garcol.todoapp.repository.CardRepository;
+import gc.garcol.todoapp.repository.TaskRepository;
 import gc.garcol.todoapp.service.CardService;
 import gc.garcol.todoapp.service.dto.CardDTO;
 import gc.garcol.todoapp.service.mapper.CardMapper;
+import gc.garcol.todoapp.utils.JacksonUtil;
+import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +34,13 @@ public class CardServiceImpl implements CardService {
     private CardRepository cardRepository;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
     private CardMapper cardMapper;
+
+    @Autowired
+    private JacksonUtil jacksonUtil;
 
     @Override
     public CardDTO save(CardDTO cardDTO) {
@@ -46,10 +56,16 @@ public class CardServiceImpl implements CardService {
     public CardDTO create(CardDTO cardDTO) {
         log.debug("Request to create Card : {}", cardDTO);
         Card card = cardMapper.toEntity(cardDTO);
-        Task task = new Task();
-        task.setId(cardDTO.getTaskId());
+//        Task task = new Task();
+//        task.setId(cardDTO.getTaskId());
+        Task task = taskRepository.getById(cardDTO.getTaskId());
+        List<Long> orders = jacksonUtil.fromString(task.getCardOrder(), Long.class);
         card.setTask(task);
         card = cardRepository.save(card);
+        orders.add(card.getId());
+        String newOrders = jacksonUtil.toString(orders);
+        task.setCardOrder(newOrders);
+        taskRepository.save(task);
         return cardMapper.toDto(card);
     }
 
@@ -92,6 +108,14 @@ public class CardServiceImpl implements CardService {
     @Override
     public void delete(Long id) {
         log.debug("Request to delete Card : {}", id);
+        Card card = cardRepository.getById(id);
+        Task task = card.getTask();
+        List<Long> orders = jacksonUtil.fromString(task.getCardOrder(), Long.class);
+        orders.remove(id);
+        String newOrders = jacksonUtil.toString(orders);
+        task.setCardOrder(newOrders);
+        taskRepository.save(task);
+
         cardRepository.deleteById(id);
     }
 }

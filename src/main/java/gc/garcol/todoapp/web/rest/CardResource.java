@@ -59,6 +59,11 @@ public class CardResource {
         if (cardDTO.getId() != null) {
             throw new BadRequestAlertException("A new card cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        if (cardDTO.getTaskId() == null) {
+            throw new BadRequestAlertException("taskId required not null", "card", "createCard");
+        }
+
         CardDTO result = cardService.create(cardDTO);
         return ResponseEntity
             .created(new URI("/api/cards/" + result.getId()))

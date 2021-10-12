@@ -1,6 +1,5 @@
 package gc.garcol.todoapp.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import gc.garcol.todoapp.domain.Card;
 import gc.garcol.todoapp.domain.Task;
 import gc.garcol.todoapp.repository.CardRepository;
@@ -9,17 +8,15 @@ import gc.garcol.todoapp.service.CardService;
 import gc.garcol.todoapp.service.dto.CardDTO;
 import gc.garcol.todoapp.service.mapper.CardMapper;
 import gc.garcol.todoapp.utils.JacksonUtil;
-import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Service Implementation for managing {@link Card}.
@@ -96,7 +93,17 @@ public class CardServiceImpl implements CardService {
     @Transactional(readOnly = true)
     public List<CardDTO> findAll(Long taskId) {
         log.debug("Request to get all Cards");
-        return cardRepository.findAllByTaskId(taskId).stream().map(cardMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        Task task = taskRepository.getById(taskId);
+        List<Long> orders = jacksonUtil.fromString(task.getCardOrder(), Long.class);
+        Map<Long, Integer> orderById = IntStream.range(0, orders.size())
+            .boxed()
+            .collect(Collectors.toMap(orders::get, i -> i));
+        return cardRepository
+            .findAllByTaskId(taskId)
+            .stream()
+            .map(cardMapper::toDto)
+            .sorted((o1, o2) -> Integer.compare(orderById.get(o1.getId()), orderById.get(o2.getId())))
+            .collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Override

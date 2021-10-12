@@ -77,11 +77,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    // not oprimize
     public void moveCard(Long taskId, Integer oldPosition, Integer newPosition) {
         Task task = taskRepository.getById(taskId);
         List<Long> orders = jacksonUtil.fromString(task.getCardOrder(), Long.class);
         Long removedItem = orders.get(oldPosition);
-        orders.remove(oldPosition);
+        orders.remove(removedItem);
         orders.add(newPosition, removedItem);
         task.setCardOrder(jacksonUtil.toString(orders));
         taskRepository.save(task);

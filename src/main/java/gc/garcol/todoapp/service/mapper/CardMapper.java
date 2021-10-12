@@ -11,4 +11,7 @@ import org.mapstruct.*;
 public interface CardMapper extends EntityMapper<CardDTO, Card> {
     @Mapping(target = "taskId", source = "task.id")
     CardDTO toDto(Card s);
+//
+//    @Mapping(source = "taskId", target = "task")
+//    Card toEntity(CardDTO dto);
 }

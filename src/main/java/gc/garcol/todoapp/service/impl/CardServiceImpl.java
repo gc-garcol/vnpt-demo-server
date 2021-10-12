@@ -1,18 +1,20 @@
 package gc.garcol.todoapp.service.impl;
 
 import gc.garcol.todoapp.domain.Card;
+import gc.garcol.todoapp.domain.Task;
 import gc.garcol.todoapp.repository.CardRepository;
 import gc.garcol.todoapp.service.CardService;
 import gc.garcol.todoapp.service.dto.CardDTO;
 import gc.garcol.todoapp.service.mapper.CardMapper;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service Implementation for managing {@link Card}.
@@ -36,6 +38,9 @@ public class CardServiceImpl implements CardService {
     public CardDTO save(CardDTO cardDTO) {
         log.debug("Request to save Card : {}", cardDTO);
         Card card = cardMapper.toEntity(cardDTO);
+        Task task = new Task();
+        task.setId(cardDTO.getTaskId());
+        card.setTask(task);
         card = cardRepository.save(card);
         return cardMapper.toDto(card);
     }

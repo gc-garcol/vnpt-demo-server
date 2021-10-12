@@ -4,26 +4,26 @@ import gc.garcol.todoapp.repository.TaskRepository;
 import gc.garcol.todoapp.service.TaskService;
 import gc.garcol.todoapp.service.dto.TaskDTO;
 import gc.garcol.todoapp.web.rest.errors.BadRequestAlertException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * REST controller for managing {@link gc.garcol.todoapp.domain.Task}.
@@ -136,6 +136,15 @@ public class TaskResource {
             result,
             HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, taskDTO.getId().toString())
         );
+    }
+
+    @PutMapping("/tasks/{id}/from/{from}/to/{to}")
+    public void moveCard(
+        @PathVariable("id") Long id,
+        @PathVariable("from") Integer from,
+        @PathVariable("to") Integer to) {
+
+        taskService.moveCard(id, from, to);
     }
 
     /**

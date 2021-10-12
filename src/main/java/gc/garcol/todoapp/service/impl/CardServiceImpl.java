@@ -43,6 +43,7 @@ public class CardServiceImpl implements CardService {
     private JacksonUtil jacksonUtil;
 
     @Override
+    // todo using partialUpdate instead
     public CardDTO save(CardDTO cardDTO) {
         log.debug("Request to save Card : {}", cardDTO);
         Card card = cardMapper.toEntity(cardDTO);

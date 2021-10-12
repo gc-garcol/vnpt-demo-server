@@ -5,9 +5,14 @@ import gc.garcol.todoapp.repository.TaskRepository;
 import gc.garcol.todoapp.service.TaskService;
 import gc.garcol.todoapp.service.dto.TaskDTO;
 import gc.garcol.todoapp.service.mapper.TaskMapper;
+
+import java.util.List;
 import java.util.Optional;
+
+import gc.garcol.todoapp.utils.JacksonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,16 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class TaskServiceImpl implements TaskService {
 
-    private final Logger log = LoggerFactory.getLogger(TaskServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskServiceImpl.class);
 
-    private final TaskRepository taskRepository;
+    @Autowired private TaskRepository taskRepository;
 
-    private final TaskMapper taskMapper;
+    @Autowired private TaskMapper taskMapper;
 
-    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper) {
-        this.taskRepository = taskRepository;
-        this.taskMapper = taskMapper;
-    }
+    @Autowired private JacksonUtil jacksonUtil;
 
     @Override
     public TaskDTO save(TaskDTO taskDTO) {
@@ -72,5 +74,16 @@ public class TaskServiceImpl implements TaskService {
     public void delete(Long id) {
         log.debug("Request to delete Task : {}", id);
         taskRepository.deleteById(id);
+    }
+
+    @Override
+    public void moveCard(Long taskId, Integer oldPosition, Integer newPosition) {
+        Task task = taskRepository.getById(taskId);
+        List<Long> orders = jacksonUtil.fromString(task.getCardOrder(), Long.class);
+        Long removedItem = orders.get(oldPosition);
+        orders.remove(oldPosition);
+        orders.add(newPosition, removedItem);
+        task.setCardOrder(jacksonUtil.toString(orders));
+        taskRepository.save(task);
     }
 }
